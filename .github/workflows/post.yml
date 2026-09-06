@@ -48,7 +48,7 @@ jobs:
           mkdir -p posts
           DATE=$(date -u +%F)
           SESSION="${{ steps.session.outputs.session }}"
-          OUT="posts/${DATE}-${SESSION}.png"
+          OUT="posts/${DATE}-${SESSION}.jpg"
           python3 render.py "$SESSION" "$OUT"
           echo "out=$OUT" >> "$GITHUB_OUTPUT"
 

@@ -14,13 +14,21 @@ import requests
 GRAPH = "https://graph.instagram.com/v21.0"
 
 
+def _raise_with_body(r):
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        print(f"Graph API error response: {r.status_code} {r.text}", file=sys.stderr)
+        raise
+
+
 def create_container(ig_user_id, token, image_url, caption):
     r = requests.post(f"{GRAPH}/{ig_user_id}/media", data={
         "image_url": image_url,
         "caption": caption,
         "access_token": token,
     }, timeout=30)
-    r.raise_for_status()
+    _raise_with_body(r)
     return r.json()["id"]
 
 
@@ -30,7 +38,7 @@ def wait_until_ready(creation_id, token, attempts=10, delay=3):
             "fields": "status_code",
             "access_token": token,
         }, timeout=30)
-        r.raise_for_status()
+        _raise_with_body(r)
         status = r.json().get("status_code")
         if status == "FINISHED":
             return True
@@ -45,7 +53,7 @@ def publish_container(ig_user_id, token, creation_id):
         "creation_id": creation_id,
         "access_token": token,
     }, timeout=30)
-    r.raise_for_status()
+    _raise_with_body(r)
     return r.json()["id"]
 
 

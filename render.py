@@ -220,7 +220,9 @@ def render(session, data, out_path):
     for ov in overlays:
         base = Image.alpha_composite(base, ov)
 
-    base.convert("RGB").save(out_path, "PNG")
+    # Instagram's Graph API (image_url container creation) requires JPEG —
+    # PNG is not an accepted format and causes a 400 on /media.
+    base.convert("RGB").save(out_path, "JPEG", quality=95)
     print(f"wrote {out_path}")
 
 
