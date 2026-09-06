@@ -1,9 +1,13 @@
 """
 Fetch real Wall Street data for the ICFINANCE daily posts.
 
-Open post  -> index futures (ES=F, NQ=F, YM=F), read ahead of the 16:30 IL open.
-Close post -> the indices themselves (^GSPC, ^IXIC, ^DJI) after the 23:00 IL close,
-              plus the day's biggest S&P 500 mover.
+Open post  -> the indices themselves (^GSPC, ^IXIC, ^DJI), read at 16:40 IL -
+               10 minutes after the 16:30 IL / 9:30 ET open, so every index has
+              already printed a real trade (right at 9:30:00 ET, yfinance often
+              has no fresh cash-index price yet). We do NOT post about futures
+              contracts - only about the actual market/indices themselves.
+Close post -> the same indices after the 23:00 IL close, plus the day's biggest
+              S&P 500 mover.
 
 Everything here is real, live data pulled via yfinance - nothing is invented.
 If a fetch fails, we raise rather than silently posting a guess, since accuracy
@@ -12,7 +16,7 @@ on financial numbers is a hard requirement for this account.
 import datetime
 import yfinance as yf
 
-OPEN_SYMBOLS = [("ES=F", "S&P 500 FUT"), ("NQ=F", "NASDAQ FUT"), ("YM=F", "DOW FUT")]
+OPEN_SYMBOLS = [("^GSPC", "S&P 500"), ("^IXIC", "NASDAQ"), ("^DJI", "DOW")]
 CLOSE_SYMBOLS = [("^GSPC", "S&P 500"), ("^IXIC", "NASDAQ"), ("^DJI", "DOW")]
 
 # A small, liquid slice of the S&P 500 used to find a "top mover" for the close
@@ -40,7 +44,7 @@ def _pct_change(ticker: yf.Ticker) -> float:
 def _headline(session: str, primary_pct: float) -> str:
     up = primary_pct >= 0
     if session == "open":
-        return "Futures Point Higher Ahead of the Open" if up else "Futures Slip Ahead of the Open"
+        return "Wall Street Opens Higher" if up else "Wall Street Opens Lower"
     return "S&P 500 Closes Higher on the Day" if up else "S&P 500 Closes Lower on the Day"
 
 
@@ -69,7 +73,7 @@ def get_data(session: str) -> dict:
     now = datetime.datetime.now()
 
     data = {
-        "session_time": "4:30 PM IL" if session == "open" else "11:00 PM IL",
+        "session_time": "4:40 PM IL" if session == "open" else "11:00 PM IL",
         "headline": _headline(session, primary_pct),
         "stats": stats,
         "date_str": now.strftime("%a · %b %-d").upper() if hasattr(now, "strftime") else str(now),
