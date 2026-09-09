@@ -63,9 +63,33 @@ jobs:
           git push
 
       - name: Publish to Instagram
+        id: publish
+        continue-on-error: true
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
         run: |
+          set +e
           RAW_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/${{ steps.render.outputs.out }}"
-          python3 publish.py "$RAW_URL" "${{ steps.render.outputs.out }}.caption.txt"
+          python3 publish.py "$RAW_URL" "${{ steps.render.outputs.out }}.caption.txt" > publish_output.log 2>&1
+          EXIT_CODE=$?
+          set -e
+          cat publish_output.log
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Save publish log on failure
+        if: steps.publish.outputs.exit_code != '0'
+        run: |
+          mkdir -p logs
+          STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+          cp publish_output.log "logs/publish-failure-${STAMP}.log"
+          git config user.name "icfinance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add logs/
+          git commit -m "Debug: log publish failure ${STAMP}"
+          git pull --rebase
+          git push
+
+      - name: Fail job if publish failed
+        if: steps.publish.outputs.exit_code != '0'
+        run: exit 1
