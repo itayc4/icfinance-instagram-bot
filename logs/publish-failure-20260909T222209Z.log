@@ -1,0 +1,14 @@
+Graph API error response: 400 {"error":{"message":"API access blocked.","type":"OAuthException","code":200,"fbtrace_id":"Ar_L3Jvf3Ls3AogBL3kEvBo"}}
+Traceback (most recent call last):
+  File "/home/runner/work/icfinance-instagram-bot/icfinance-instagram-bot/publish.py", line 77, in <module>
+    main()
+  File "/home/runner/work/icfinance-instagram-bot/icfinance-instagram-bot/publish.py", line 69, in main
+    creation_id = create_container(ig_user_id, token, image_url, caption)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/icfinance-instagram-bot/icfinance-instagram-bot/publish.py", line 31, in create_container
+    _raise_with_body(r)
+  File "/home/runner/work/icfinance-instagram-bot/icfinance-instagram-bot/publish.py", line 19, in _raise_with_body
+    r.raise_for_status()
+  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://graph.instagram.com/v21.0/28803458915926948/media
