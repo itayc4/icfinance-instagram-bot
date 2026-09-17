@@ -9,13 +9,17 @@ on:
         default: "open"
         type: choice
         options: [open, close]
-  schedule:
-    # 16:40 Israel time (IDT, UTC+3) -> 13:40 UTC. 10 min after the actual
-    # 16:30/9:30 ET open, so the indices themselves (not futures) already have
-    # a real first print. Update if Israel DST changes.
-    - cron: "40 13 * * 1-5"
-    # 23:00 Israel time (IDT, UTC+3) -> 20:00 UTC. Update if Israel DST changes.
-    - cron: "0 20 * * 1-5"
+  # schedule: PAUSED on 2026-09-17 - every automatic run since ~Sep 9 has
+  # failed at the "Publish to Instagram" step with the same "API access
+  # blocked" error (see logs/publish-failure-*.log), which was spamming
+  # failure-notification emails without actually posting anything. Re-enable
+  # (uncomment) only after a manual workflow_dispatch run has been confirmed
+  # to actually publish successfully.
+  # schedule:
+  #   # 16:40 Israel time (IDT, UTC+3) -> 13:40 UTC.
+  #   - cron: "40 13 * * 1-5"
+  #   # 23:00 Israel time (IDT, UTC+3) -> 20:00 UTC.
+  #   - cron: "0 20 * * 1-5"
 
 permissions:
   contents: write
